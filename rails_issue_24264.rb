@@ -8,8 +8,8 @@ end
 gemfile(true) do
   source 'https://rubygems.org'
   # Activate the gem you are reporting the issue against.
-  #gem 'rails', git: 'https://github.com/rails/rails'
-  gem 'rails', path: '/home/tiki/rails'
+  gem 'rails', git: 'https://github.com/rails/rails'
+  #gem 'rails', path: '/home/tiki/rails'
   gem 'pry'
   gem 'pry-stack_explorer'
   gem 'pry-byebug'
@@ -128,12 +128,18 @@ class BugTest < Minitest::Test
 
     # Index and Create should route without an ID
     api_without_id.each do |key|
-      assert_instance_of(String, app_route_helper.path_for(controller: 'api_routes', action: key))
+      assert proc {
+        get(app_route_helper.path_for(controller: 'api_routes', action: key))
+        last_response.status == 200
+      }
     end
 
     # Show, Update and Destroy should route with ID
     api_with_id.each do |key|
-      assert_instance_of(String, app_route_helper.path_for(controller: 'api_routes', action: key, id: 0))
+      assert proc {
+        get(app_route_helper.path_for(controller: 'api_routes', action: key, id: 0))
+        last_response.status == 200
+      }
     end
 
     # New and Edit should not route in API mode
@@ -152,12 +158,18 @@ class BugTest < Minitest::Test
 
     # Index, Create, and New should route without an ID
     engine_without_id.each do |key|
-      assert_instance_of(String, engine_route_helper.path_for(controller: 'test_engine/non_api_routes', action: key))
+      assert proc {
+        get(engine_route_helper.path_for(controller: 'test_engine/non_api_routes', action: key))
+        last_response.status == 200
+      }
     end
 
     # Show, Update, Destroy, and Edit should route with ID
     api_with_id.each do |key|
-      assert_instance_of(String, engine_route_helper.path_for(controller: 'test_engine/non_api_routes', action: key, id: 0))
+      assert proc {
+        get(engine_route_helper.path_for(controller: 'test_engine/non_api_routes', action: key, id: 0))
+        last_response.status == 200
+      }
     end
   end
 
